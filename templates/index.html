@@ -4,7 +4,7 @@
     <title>Server-Side Python</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Bootstrap -->
-    <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="static/css/bootstrap.min.css" rel="stylesheet" media="screen">
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -17,7 +17,7 @@
 
       <div class="starter-template">
         <h1>Run Some Basic Python</h1>
-        <p class="lead">The entire purpose of htis page is to run a Python script.<br> Type what you want below, and we'll try to count the number of words with a server-side Python script.</p>
+        <p class="lead">The entire purpose of this page is to run a Python script.<br> Type what you want below, and we'll try to count the number of words with a server-side Python script.</p>
       </div>
 
     </div><!-- /.container -->
@@ -25,26 +25,75 @@
 <div class="container">
 
       <form class="form">
-        <h2 class="form-heading">Write some things.</h2>
+        <h3 class="form-heading">Write some things.</h3>
         <input type="text" name="words" class="form-control" placeholder="Python will evaluate what you write here." autofocus="">
-        <button class="btn btn-lg btn-primary btn-block" type="submit" style="width:100px">Evaluate</button>
+        <button id="eval" class="btn btn-lg btn-primary btn-block" type="button" style="width:100px">Evaluate</button>
+	<br>
+	<span id="nwords"></span>
       </form>
-    <span></span>
     </div>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="http://code.jquery.com/jquery.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="js/bootstrap.min.js"></script>
-    <script>
-      $( "form" ).submit(function( event ) {
-      $.getJSON($SCRIPT_ROOT + '/_count_words', {
-        inp: $('input[name="words"]')
-      }, function(data) {
-        $("span").text(data.result);
-      });
-      return false;
-      };
+    <script src="static/js/bootstrap.min.js"></script>
+    <script src="static/js/repo.min.js"></script>
+    <script type=text/javascript>
+      $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
     </script>
+
+    <script>
+     $(function() {
+       $('button#eval').bind('click', function() {
+         $.getJSON($SCRIPT_ROOT + '/_count_words', {
+           words: $('input[name="words"]').val(),
+         }, function(data) {
+           $("span#nwords").fadeTo(2,0.8);
+           $("span#nwords").text("It looks like you have "+data.result+" words.");        
+           $("span#nwords").fadeTo(1000,1.0);
+         });
+         return false;
+       });
+     });
+    </script>
+
+<div class="container">
+
+      <form class="form">
+        <h3 class="form-heading">Write some more things.</h3>
+	<h4>You don't need to press any buttons...</h4>
+        <textarea name="wordsrt" placeholder="Python will evaluate what you write here." autofocus=""></textarea>
+	<br>
+	<span id="nwordsrt"></span>
+      </form>
+    </div>
+
+
+    <script>
+     $(function() {
+       $('textarea').bind('keyup', function() {
+         $.getJSON($SCRIPT_ROOT + '/_count_words', {
+           words: $('textarea').val(),
+         }, function(data) {
+           $("span#nwordsrt").fadeTo(0,0.8);
+           $("span#nwordsrt").text("It looks like you have "+data.result+" words.");        
+           $("span#nwordsrt").fadeTo(50,1);
+         });
+         return false;
+       });
+     });
+    </script>
+
+<div class="container">
+  <h2>The code is on <a href="https://github.com/alexstorer/pyserve">Github</a>.</h2>
+  It uses <a href="http://getbootstrap.com">Bootstrap</a>, <a href="http://flask.pocoo.org/">Flask</a> and <a href="http://darcyclarke.me/dev/repojs/">Repo.js</a>.
+  <div id="repo"></div>
+</div>
+
+<script>
+  $('div#repo').repo({ user: 'alexstorer', name: 'pyserve' });
+</script>
+
+
   </body>
 </html>
