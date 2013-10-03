@@ -1,0 +1,55 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Resources": {
+    "instancei9538d0ec": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "AvailabilityZone": "us-east-1b",
+        "DisableApiTermination": "FALSE",
+        "ImageId": "ami-c30360aa",
+        "InstanceType": "t1.micro",
+        "KernelId": "aki-88aa75e1",
+        "KeyName": "amykey",
+        "SourceDestCheck": "",
+        "Monitoring": "false",
+        "SecurityGroups": [
+          {
+            "Ref": "sgWeb"
+          }
+        ],
+	"UserData": { "Fn::Base64" : { "Fn::Join" : ["", [
+          "#!/bin/bash -v\n",
+          "",
+	  "curl https://raw.github.com/alexstorer/pyserve/master/setup.sh | sh\n"
+        ]]}},        
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "pyserve instance"
+          }
+        ]
+      }
+    },
+    "sgWeb": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Let people connect to it via browser",
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "22",
+            "ToPort": "22",
+            "CidrIp": "0.0.0.0/0"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "80",
+            "ToPort": "80",
+            "CidrIp": "0.0.0.0/0"
+          }
+        ]
+      }
+    }
+  },
+  "Description": "Launch a basic webserver, which executes server-side python."
+}
